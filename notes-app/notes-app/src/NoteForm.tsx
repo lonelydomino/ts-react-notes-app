@@ -1,4 +1,4 @@
-import React, { FormEvent, useState } from 'react'
+import { FormEvent, useState } from 'react'
 import {Col, Form, Row, Stack, Button } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import CreatableReactSelect from 'react-select/creatable'
@@ -6,6 +6,7 @@ import { useRef } from 'react'
 import { NoteData, Tag } from './App'
 import { v4 as uuidV4 } from "uuid"
 import { useNavigate } from 'react-router-dom'
+
 type NoteFormProps = {
     onSubmit: (data: NoteData) => void
     onAddTag: (tag: Tag) => void
@@ -65,7 +66,7 @@ const NoteForm = ({ onSubmit, onAddTag, availableTags }: NoteFormProps) => {
             <Form.Control required as='textarea' ref={markdownRef} rows={15} />
         </Form.Group>
         <Stack direction="horizontal" gap={2} className='justify-content-end'>
-            <Button variant="outline-primary">Save</Button>
+            <Button type='submit' variant="outline-primary">Save</Button>
             <Link to="..">
                 <Button type="button" variant="outline-secondary">Cancel</Button>
             </Link>
