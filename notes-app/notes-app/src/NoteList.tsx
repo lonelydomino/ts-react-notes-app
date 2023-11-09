@@ -1,4 +1,4 @@
-import { Col, Row, Stack, Button, Form, Card, Badge} from 'react-bootstrap'
+import { Col, Row, Stack, Button, Form, Card, Badge, Modal} from 'react-bootstrap'
 import {Link } from 'react-router-dom'
 import ReactSelect from 'react-select'
 import { useMemo, useState } from 'react'
@@ -13,11 +13,22 @@ type SimplifiedNote = {
 type NoteListProps = {
     availableTags: Tag[]
     notes: SimplifiedNote[]
+    onDeleteTag: (id: string) => void
+    onUpdateTag: (id:string, label: string) => void
 }
 
-const NoteList = ({ availableTags, notes }: NoteListProps ) => {
+type EditTagsModalProps = {
+    show: boolean
+    availableTags: Tag[]
+    handleClose: () => void
+    onDeleteTag: (id: string) => void
+    onUpdateTag: (id:string, label: string) => void
+}
+
+const NoteList = ({ availableTags, notes, onUpdateTag, onDeleteTag }: NoteListProps ) => {
     const [selectedTags, setSelectedTags] = useState<Tag[]>([])
     const [title, setTitle] = useState('')
+    const [editTagsModalIsOpen, setEditTagsModalIsOpen] = useState(false)
 
     const filteredNotes = useMemo(() => {
         return notes.filter(note => {
@@ -37,7 +48,7 @@ const NoteList = ({ availableTags, notes }: NoteListProps ) => {
                     <Link to='/new'>
                         <Button variant="primary">Create</Button>
                     </Link>
-                    <Button variant='outline-secondary'>Edit Tags</Button>
+                    <Button onClick={() => setEditTagsModalIsOpen(true) }variant='outline-secondary'>Edit Tags</Button>
 
                 </Stack>
             </Col>
@@ -76,6 +87,7 @@ const NoteList = ({ availableTags, notes }: NoteListProps ) => {
                 </Col>
             ))}
         </Row>
+        <EditTagsModal onUpdateTag={onUpdateTag} onDeleteTag={onDeleteTag} show={editTagsModalIsOpen} handleClose={() => setEditTagsModalIsOpen(false)} availableTags={availableTags}/>
 
     </>
     )
@@ -97,3 +109,27 @@ const NoteCard = ({id, title, tags}: SimplifiedNote) => {
     </Card>
 }
 export default NoteList
+
+const EditTagsModal = ({ availableTags,handleClose, show, onDeleteTag, onUpdateTag } : EditTagsModalProps) => {
+    return <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+            <Modal.Title>Edit Tags</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+            <Form>
+                <Stack gap={2}>
+                    {availableTags.map(tag => (
+                        <Row key={tag.id}>
+                            <Col>
+                                <Form.Control type='text' value={tag.label} onChange={e => onUpdateTag(tag.id, e.target.value)}/>
+                            </Col>
+                            <Col xs='auto'>
+                                <Button variant="outline-danger" onClick={()=> onDeleteTag(tag.id)}>&times;</Button>
+                            </Col>
+                        </Row>
+                    ))}
+                </Stack>
+            </Form>
+        </Modal.Body>
+    </Modal>
+}
